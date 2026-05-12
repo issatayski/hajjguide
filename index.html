@@ -1,0 +1,1889 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HajjGuide — Карта и сервис для паломников Мекки и Медины</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green-deep: #0d4d35;
+    --green-mid: #166548;
+    --green-light: #1f8259;
+    --green-bg: #e8f3ee;
+    --gold: #c9a44a;
+    --gold-light: #f0d589;
+    --gold-bg: #fef6e7;
+    --ink: #1a2620;
+    --ink-soft: #4a5750;
+    --ink-mute: #7a8a82;
+    --line: #d4dcd7;
+    --bg-soft: #f7faf8;
+    --white: #ffffff;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Manrope', sans-serif;
+    color: var(--ink);
+    background: var(--white);
+    line-height: 1.6;
+    font-size: 16px;
+  }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+  .display { font-family: 'Cormorant Garamond', serif; font-weight: 600; letter-spacing: -0.5px; }
+  .label-tag {
+    display: inline-block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+
+  /* ============ NAV ============ */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 18px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--green-deep);
+  }
+  .logo-mark {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--green-deep), var(--green-light));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--ink-soft);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--green-deep); }
+  .btn {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-primary {
+    background: var(--green-deep);
+    color: white;
+  }
+  .btn-primary:hover { background: var(--green-light); transform: translateY(-1px); }
+  .btn-gold {
+    background: var(--gold);
+    color: white;
+  }
+  .btn-gold:hover { background: #b08f3a; }
+  .btn-outline {
+    background: transparent;
+    color: var(--green-deep);
+    border: 1.5px solid var(--green-deep);
+  }
+  .btn-outline:hover { background: var(--green-deep); color: white; }
+
+  /* ============ HERO ============ */
+  .hero {
+    position: relative;
+    padding: 80px 0 100px;
+    background:
+      radial-gradient(ellipse at top right, rgba(201,164,74,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom left, rgba(13,77,53,0.05) 0%, transparent 50%),
+      linear-gradient(180deg, #fbfcfb 0%, #ffffff 100%);
+    overflow: hidden;
+  }
+  .hero-ornament {
+    position: absolute;
+    opacity: 0.06;
+    pointer-events: none;
+  }
+  .hero-ornament-1 {
+    top: 40px;
+    right: -100px;
+    width: 400px;
+    height: 400px;
+  }
+  .hero-ornament-2 {
+    bottom: -50px;
+    left: -80px;
+    width: 300px;
+    height: 300px;
+  }
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+  }
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 56px;
+    line-height: 1.05;
+    font-weight: 600;
+    color: var(--green-deep);
+    margin-bottom: 24px;
+    letter-spacing: -1px;
+  }
+  .hero h1 .accent {
+    color: var(--gold);
+    font-style: italic;
+  }
+  .hero .lead {
+    font-size: 19px;
+    color: var(--ink-soft);
+    margin-bottom: 32px;
+    line-height: 1.55;
+    max-width: 540px;
+  }
+  .hero-cta {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+  .hero-trust {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+  .trust-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--ink-mute);
+  }
+  .trust-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--green-light);
+  }
+
+  /* Hero phone mockup */
+  .hero-visual {
+    position: relative;
+    height: 600px;
+  }
+  .phone {
+    position: absolute;
+    width: 320px;
+    height: 580px;
+    background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+    border-radius: 40px;
+    padding: 12px;
+    box-shadow:
+      0 25px 60px rgba(13,77,53,0.18),
+      0 8px 30px rgba(0,0,0,0.12);
+    top: 0;
+    right: 0;
+  }
+  .phone-screen {
+    width: 100%;
+    height: 100%;
+    background: #f3f6f4;
+    border-radius: 30px;
+    overflow: hidden;
+    position: relative;
+  }
+  .notch {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90px;
+    height: 22px;
+    background: #0a0a0a;
+    border-radius: 12px;
+    z-index: 5;
+  }
+  .phone-header {
+    background: var(--green-deep);
+    padding: 38px 16px 14px;
+    color: white;
+  }
+  .phone-search {
+    background: rgba(255,255,255,0.15);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .phone-map {
+    height: 280px;
+    background:
+      linear-gradient(45deg, #d4e3dc 25%, transparent 25%),
+      linear-gradient(-45deg, #d4e3dc 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #d4e3dc 75%),
+      linear-gradient(-45deg, transparent 75%, #d4e3dc 75%);
+    background-size: 30px 30px;
+    background-color: #e8f3ee;
+    background-position: 0 0, 0 15px, 15px -15px, -15px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .map-pin {
+    position: absolute;
+    width: 24px;
+    height: 30px;
+    transform: translate(-50%, -100%);
+  }
+  .pin-1 { top: 100px; left: 50%; }
+  .pin-2 { top: 70px; left: 30%; }
+  .pin-3 { top: 130px; left: 70%; }
+  .pin-4 { top: 180px; left: 40%; }
+  .pin-5 { top: 200px; left: 65%; }
+  .map-haram {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    background: var(--gold);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    box-shadow: 0 0 0 4px rgba(201,164,74,0.3);
+  }
+  .phone-list {
+    padding: 14px;
+  }
+  .list-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    border: 1px solid #e8ede9;
+  }
+  .list-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--green-bg);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--green-deep);
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .list-text { flex: 1; min-width: 0; }
+  .list-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+  .list-meta {
+    font-size: 9px;
+    color: var(--ink-mute);
+  }
+  .list-distance {
+    font-size: 10px;
+    color: var(--green-light);
+    font-weight: 600;
+  }
+
+  /* Floating badge */
+  .float-badge {
+    position: absolute;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(13,77,53,0.12);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .badge-1 {
+    top: 100px;
+    left: -20px;
+  }
+  .badge-2 {
+    bottom: 60px;
+    left: -40px;
+  }
+  .badge-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--green-bg);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--green-deep);
+    font-size: 18px;
+  }
+  .badge-text-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .badge-text-sub {
+    font-size: 11px;
+    color: var(--ink-mute);
+  }
+
+  /* ============ STATS BAR ============ */
+  .stats {
+    background: var(--green-deep);
+    color: white;
+    padding: 40px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .stats::before {
+    content: "";
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(201,164,74,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+    position: relative;
+    z-index: 2;
+  }
+  .stat-item {
+    text-align: center;
+    border-right: 1px solid rgba(255,255,255,0.15);
+    padding: 0 20px;
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--gold-light);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .stat-label {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    opacity: 0.85;
+    font-weight: 500;
+  }
+
+  /* ============ PAIN SECTION ============ */
+  section { padding: 100px 0; }
+  .section-header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+  .section-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 44px;
+    font-weight: 600;
+    color: var(--green-deep);
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .section-header h2 .accent {
+    color: var(--gold);
+    font-style: italic;
+  }
+  .section-header .lead {
+    font-size: 18px;
+    color: var(--ink-soft);
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .pain {
+    background: #fbf8f3;
+  }
+  .pain-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .pain-card {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    border: 1px solid var(--line);
+    position: relative;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .pain-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+  }
+  .pain-num {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 60px;
+    font-weight: 700;
+    color: var(--gold);
+    opacity: 0.2;
+    line-height: 1;
+  }
+  .pain-icon {
+    width: 56px;
+    height: 56px;
+    background: #fef2e7;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #c75500;
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  .pain-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--green-deep);
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+  .pain-card p {
+    color: var(--ink-soft);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ============ SOLUTION ============ */
+  .solution {
+    background: linear-gradient(180deg, white 0%, var(--bg-soft) 100%);
+  }
+  .solution-hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    margin-bottom: 80px;
+  }
+  .solution-text h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 44px;
+    font-weight: 600;
+    color: var(--green-deep);
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+  .solution-text h2 .accent {
+    color: var(--gold);
+    font-style: italic;
+  }
+  .solution-text .lead {
+    font-size: 18px;
+    color: var(--ink-soft);
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+  .solution-list {
+    list-style: none;
+  }
+  .solution-list li {
+    display: flex;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 16px;
+  }
+  .check {
+    width: 28px;
+    height: 28px;
+    background: var(--green-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--green-deep);
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  /* Map visual */
+  .map-visual {
+    background: white;
+    border-radius: 24px;
+    padding: 24px;
+    border: 1px solid var(--line);
+    box-shadow: 0 20px 50px rgba(13,77,53,0.08);
+  }
+  .map-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .map-tab {
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--bg-soft);
+    color: var(--ink-soft);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .map-tab.active {
+    background: var(--green-deep);
+    color: white;
+    border-color: var(--green-deep);
+  }
+  .map-tab .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .dot-food { background: #e85a4f; }
+  .dot-shop { background: #ff9f43; }
+  .dot-medical { background: #5b9bf2; }
+  .dot-money { background: #8e74e8; }
+  .dot-guide { background: var(--gold); }
+  .map-canvas {
+    height: 320px;
+    background:
+      radial-gradient(circle at 30% 40%, rgba(13,77,53,0.08) 0%, transparent 30%),
+      radial-gradient(circle at 70% 60%, rgba(201,164,74,0.1) 0%, transparent 30%),
+      linear-gradient(135deg, #e8f3ee 0%, #f3f6f4 100%);
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .map-canvas::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(13,77,53,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(13,77,53,0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .map-kaaba {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .kaaba-block {
+    width: 50px;
+    height: 50px;
+    background: #1a1a1a;
+    border-radius: 6px;
+    margin: 0 auto 8px;
+    position: relative;
+    box-shadow: 0 0 0 5px rgba(201,164,74,0.2);
+  }
+  .kaaba-block::after {
+    content: "ﷲ";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--gold);
+    font-size: 18px;
+  }
+  .kaaba-label {
+    background: white;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--green-deep);
+    display: inline-block;
+  }
+  .map-marker {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .map-marker:hover { transform: scale(1.15); }
+  .m-food { background: #e85a4f; }
+  .m-shop { background: #ff9f43; }
+  .m-medical { background: #5b9bf2; }
+  .m-money { background: #8e74e8; }
+  .m-guide { background: var(--gold); }
+  .mk-1 { top: 20%; left: 25%; }
+  .mk-2 { top: 30%; left: 70%; }
+  .mk-3 { top: 70%; left: 30%; }
+  .mk-4 { top: 75%; left: 75%; }
+  .mk-5 { top: 35%; left: 15%; }
+  .mk-6 { top: 60%; left: 60%; }
+  .mk-7 { top: 20%; left: 50%; }
+  .mk-8 { top: 80%; left: 50%; }
+
+  /* ============ FEATURES GRID ============ */
+  .features {
+    background: white;
+  }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .feature-card {
+    background: white;
+    padding: 36px 28px;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transition: transform 0.3s;
+    transform-origin: left;
+  }
+  .feature-card:hover {
+    border-color: var(--green-light);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(13,77,53,0.08);
+  }
+  .feature-card:hover::before { transform: scaleX(1); }
+  .feature-card.highlight {
+    background: linear-gradient(135deg, var(--green-deep), var(--green-mid));
+    color: white;
+    border: none;
+  }
+  .feature-card.highlight::before { background: var(--gold-light); }
+  .feature-card.highlight h3 { color: white; }
+  .feature-card.highlight p { color: rgba(255,255,255,0.85); }
+  .feature-card.highlight .feat-icon {
+    background: rgba(255,255,255,0.15);
+    color: var(--gold-light);
+  }
+  .feat-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--green-bg);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--green-deep);
+    font-size: 28px;
+    margin-bottom: 20px;
+  }
+  .feature-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--green-deep);
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+  .feature-card p {
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+
+  /* ============ GUIDE MARKETPLACE ============ */
+  .guides {
+    background: linear-gradient(135deg, #fbf8f3 0%, #fef6e7 100%);
+  }
+  .guides-inner {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  .guide-card-stack {
+    position: relative;
+    height: 520px;
+  }
+  .guide-card {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+    position: absolute;
+    width: 90%;
+    border: 1px solid var(--line);
+  }
+  .gc-1 {
+    top: 0;
+    left: 0;
+    z-index: 3;
+    transform: rotate(-3deg);
+  }
+  .gc-2 {
+    top: 40px;
+    right: 0;
+    z-index: 2;
+    transform: rotate(2deg);
+  }
+  .gc-3 {
+    bottom: 0;
+    left: 20px;
+    z-index: 1;
+    transform: rotate(-1deg);
+  }
+  .guide-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .guide-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--green-deep), var(--green-light));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 20px;
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .guide-name {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--ink);
+  }
+  .guide-cred {
+    font-size: 12px;
+    color: var(--ink-mute);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+  }
+  .verified {
+    background: var(--green-bg);
+    color: var(--green-deep);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .guide-langs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .lang-tag {
+    background: var(--bg-soft);
+    color: var(--ink-soft);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .guide-meta {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    font-size: 13px;
+  }
+  .guide-rating { color: var(--gold); font-weight: 700; }
+  .guide-price {
+    color: var(--green-deep);
+    font-weight: 700;
+    font-size: 16px;
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  /* ============ HOW IT WORKS ============ */
+  .how {
+    background: white;
+  }
+  .how-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    position: relative;
+  }
+  .how-steps::before {
+    content: "";
+    position: absolute;
+    top: 40px;
+    left: 12.5%;
+    right: 12.5%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold) 0%, var(--green-light) 100%);
+    opacity: 0.3;
+    z-index: 0;
+  }
+  .how-step {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+  .step-num {
+    width: 80px;
+    height: 80px;
+    background: white;
+    border: 3px solid var(--gold);
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--green-deep);
+  }
+  .how-step h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--green-deep);
+    margin-bottom: 8px;
+  }
+  .how-step p {
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+
+  /* ============ BENEFITS COMPARISON ============ */
+  .benefits {
+    background: var(--bg-soft);
+  }
+  .compare {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    border: 1px solid var(--line);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .compare-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 20px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+  }
+  .compare-row:last-child { border-bottom: none; }
+  .compare-header {
+    font-weight: 700;
+    color: var(--ink-mute);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .compare-feature {
+    font-size: 15px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .compare-cell {
+    text-align: center;
+    font-size: 14px;
+  }
+  .yes { color: var(--green-light); font-weight: 700; }
+  .no { color: #c75555; font-weight: 600; }
+  .partial { color: #c9a44a; font-weight: 600; }
+
+  /* ============ TESTIMONIALS ============ */
+  .testimonials {
+    background: white;
+  }
+  .test-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .test-card {
+    background: var(--bg-soft);
+    border-radius: 20px;
+    padding: 32px;
+    position: relative;
+    border: 1px solid var(--line);
+  }
+  .test-quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 80px;
+    color: var(--gold);
+    line-height: 0.8;
+    opacity: 0.4;
+    position: absolute;
+    top: 20px;
+    right: 24px;
+  }
+  .test-text {
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-style: italic;
+    position: relative;
+    z-index: 2;
+  }
+  .test-author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .test-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--green-deep);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .test-name {
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 14px;
+  }
+  .test-role {
+    font-size: 12px;
+    color: var(--ink-mute);
+  }
+
+  /* ============ FAQ ============ */
+  .faq {
+    background: var(--bg-soft);
+  }
+  .faq-list {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .faq-item {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 12px;
+  }
+  .faq-q {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--green-deep);
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .faq-q::after {
+    content: "+";
+    color: var(--gold);
+    font-size: 28px;
+    font-weight: 400;
+  }
+  .faq-a {
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+
+  /* ============ CTA FINAL ============ */
+  .cta-final {
+    background:
+      radial-gradient(ellipse at top, rgba(201,164,74,0.2) 0%, transparent 50%),
+      linear-gradient(135deg, var(--green-deep) 0%, var(--green-mid) 100%);
+    color: white;
+    text-align: center;
+    padding: 100px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-final::before {
+    content: "";
+    position: absolute;
+    bottom: -100px;
+    right: -100px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(201,164,74,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .cta-final::after {
+    content: "";
+    position: absolute;
+    top: -100px;
+    left: -100px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .cta-final-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .cta-final h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 52px;
+    font-weight: 600;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+  .cta-final h2 .accent {
+    color: var(--gold-light);
+    font-style: italic;
+  }
+  .cta-final p {
+    font-size: 19px;
+    opacity: 0.9;
+    margin-bottom: 36px;
+    line-height: 1.5;
+  }
+  .cta-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+  .btn-large {
+    padding: 16px 32px;
+    font-size: 16px;
+  }
+  .btn-white {
+    background: white;
+    color: var(--green-deep);
+  }
+  .btn-white:hover { background: var(--gold-light); }
+  .btn-ghost {
+    background: transparent;
+    color: white;
+    border: 1.5px solid rgba(255,255,255,0.4);
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.1); }
+  .app-badges {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .app-badge {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 12px 20px;
+    border-radius: 10px;
+    color: white;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+  .app-badge:hover { background: rgba(255,255,255,0.18); }
+
+  /* ============ FOOTER ============ */
+  footer {
+    background: #0a3825;
+    color: rgba(255,255,255,0.7);
+    padding: 60px 0 30px;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+  }
+  .footer-brand h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    color: white;
+    margin-bottom: 12px;
+  }
+  .footer-brand p {
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 320px;
+  }
+  .footer-col h5 {
+    color: white;
+    font-size: 14px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .footer-col ul {
+    list-style: none;
+  }
+  .footer-col ul li {
+    margin-bottom: 10px;
+  }
+  .footer-col ul a {
+    color: rgba(255,255,255,0.65);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+  }
+  .footer-col ul a:hover { color: var(--gold-light); }
+  .footer-bottom {
+    padding-top: 30px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    text-align: center;
+    font-size: 13px;
+  }
+
+  /* Languages tags row */
+  .languages-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
+  .lang-pill {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 8px 14px;
+    border-radius: 30px;
+    font-size: 13px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero-inner, .solution-hero, .guides-inner, .footer-grid {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+    .hero h1, .section-header h2, .solution-text h2, .cta-final h2 { font-size: 36px; }
+    .stats-grid, .pain-grid, .features-grid, .test-grid, .how-steps {
+      grid-template-columns: 1fr 1fr;
+    }
+    .how-steps::before { display: none; }
+    .nav-links { display: none; }
+    .container { padding: 0 20px; }
+    section { padding: 60px 0; }
+    .stat-num { font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="logo">
+      <div class="logo-mark">ﷲ</div>
+      HajjGuide
+    </div>
+    <ul class="nav-links">
+      <li><a href="#features">Возможности</a></li>
+      <li><a href="#guides">Гиды</a></li>
+      <li><a href="#how">Как это работает</a></li>
+      <li><a href="#faq">Вопросы</a></li>
+    </ul>
+    <a href="#cta" class="btn btn-primary">Скачать приложение</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <svg class="hero-ornament hero-ornament-1" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+    <g fill="none" stroke="#c9a44a" stroke-width="1.5">
+      <circle cx="200" cy="200" r="180"/>
+      <circle cx="200" cy="200" r="140"/>
+      <circle cx="200" cy="200" r="100"/>
+      <polygon points="200,40 260,120 260,280 200,360 140,280 140,120"/>
+      <polygon points="200,80 240,140 240,260 200,320 160,260 160,140"/>
+    </g>
+  </svg>
+  <svg class="hero-ornament hero-ornament-2" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+    <g fill="none" stroke="#0d4d35" stroke-width="1.5">
+      <path d="M150,30 L210,90 L210,210 L150,270 L90,210 L90,90 Z"/>
+      <path d="M150,60 L185,95 L185,205 L150,240 L115,205 L115,95 Z"/>
+      <circle cx="150" cy="150" r="40"/>
+      <circle cx="150" cy="150" r="20"/>
+    </g>
+  </svg>
+  <div class="container">
+    <div class="hero-inner">
+      <div>
+        <span class="label-tag">Карта & сервис для паломников</span>
+        <h1>Всё для Хаджа и Умры — <span class="accent">в одной ладони</span></h1>
+        <p class="lead">Карта Мекки и Медины с ресторанами, аптеками, гидами и обменниками. Бронирование лицензированного мутаввифа на родном языке. Все обряды по шагам. Офлайн-режим.</p>
+        <div class="hero-cta">
+          <a href="#cta" class="btn btn-primary btn-large">Установить бесплатно</a>
+          <a href="#features" class="btn btn-outline btn-large">Посмотреть возможности</a>
+        </div>
+        <div class="hero-trust">
+          <div class="trust-item">
+            <svg class="trust-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4 5v6c0 5 3.5 9.5 8 11 4.5-1.5 8-6 8-11V5l-8-3z"/></svg>
+            Лицензированные гиды
+          </div>
+          <div class="trust-item">
+            <svg class="trust-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.4-1.4L10 14.2l7.6-7.6L19 8l-9 9z"/></svg>
+            Эскроу-платежи
+          </div>
+          <div class="trust-item">
+            <svg class="trust-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 7l11 5 9-4.1V17h2V7M5 13.2v4L12 21l7-3.8v-4L12 17l-7-3.8z"/></svg>
+            Соответствие шариату
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="phone">
+          <div class="notch"></div>
+          <div class="phone-screen">
+            <div class="phone-header">
+              <div style="font-size: 11px; opacity: 0.8;">МЕККА · АЗИЗИЯ</div>
+              <div style="font-size: 15px; font-weight: 700; margin-top: 2px;">Рядом с Харамом</div>
+              <div class="phone-search">
+                <span style="opacity: 0.7;">🔍</span>
+                <span style="opacity: 0.8;">Найти ресторан, аптеку, гида...</span>
+              </div>
+            </div>
+            <div class="phone-map">
+              <div class="map-haram">Харам</div>
+              <svg class="map-pin pin-1" viewBox="0 0 24 30"><path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 18 12 18s12-9 12-18c0-6.6-5.4-12-12-12z" fill="#e85a4f"/><circle cx="12" cy="12" r="5" fill="white"/></svg>
+              <svg class="map-pin pin-2" viewBox="0 0 24 30"><path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 18 12 18s12-9 12-18c0-6.6-5.4-12-12-12z" fill="#ff9f43"/><circle cx="12" cy="12" r="5" fill="white"/></svg>
+              <svg class="map-pin pin-3" viewBox="0 0 24 30"><path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 18 12 18s12-9 12-18c0-6.6-5.4-12-12-12z" fill="#5b9bf2"/><circle cx="12" cy="12" r="5" fill="white"/></svg>
+              <svg class="map-pin pin-4" viewBox="0 0 24 30"><path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 18 12 18s12-9 12-18c0-6.6-5.4-12-12-12z" fill="#c9a44a"/><circle cx="12" cy="12" r="5" fill="white"/></svg>
+              <svg class="map-pin pin-5" viewBox="0 0 24 30"><path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 18 12 18s12-9 12-18c0-6.6-5.4-12-12-12z" fill="#8e74e8"/><circle cx="12" cy="12" r="5" fill="white"/></svg>
+            </div>
+            <div class="phone-list">
+              <div class="list-item">
+                <div class="list-icon" style="background: #fde2dd; color: #c75555;">🍽</div>
+                <div class="list-text">
+                  <div class="list-title">Ресторан Аль-Барака</div>
+                  <div class="list-meta">Турецкая · Халяль · ★ 4.8</div>
+                </div>
+                <div class="list-distance">120м</div>
+              </div>
+              <div class="list-item">
+                <div class="list-icon" style="background: #fdecdc; color: #c97a1f;">🛒</div>
+                <div class="list-text">
+                  <div class="list-title">Ихрам & сувениры</div>
+                  <div class="list-meta">Открыто · Говорят по-русски</div>
+                </div>
+                <div class="list-distance">340м</div>
+              </div>
+              <div class="list-item">
+                <div class="list-icon" style="background: #fef6e7; color: #8a6500;">👤</div>
+                <div class="list-text">
+                  <div class="list-title">Гид Абдулла</div>
+                  <div class="list-meta">RU · TR · AR · ★ 4.9</div>
+                </div>
+                <div class="list-distance">★ 247</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="float-badge badge-1">
+          <div class="badge-icon">📍</div>
+          <div>
+            <div class="badge-text-title">15 000+ мест</div>
+            <div class="badge-text-sub">Проверенные точки</div>
+          </div>
+        </div>
+        <div class="float-badge badge-2">
+          <div class="badge-icon">👥</div>
+          <div>
+            <div class="badge-text-title">600+ гидов</div>
+            <div class="badge-text-sub">Лицензированных</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<section class="stats" style="padding: 50px 0;">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-num">16M+</div>
+        <div class="stat-label">Паломников ежегодно</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">15K+</div>
+        <div class="stat-label">Точек на карте</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">6</div>
+        <div class="stat-label">Языков интерфейса</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">24/7</div>
+        <div class="stat-label">Поддержка</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PAIN -->
+<section class="pain">
+  <div class="container">
+    <div class="section-header">
+      <span class="label-tag">Знакомая боль</span>
+      <h2>Каждый паломник <span class="accent">сталкивается с этим</span></h2>
+      <p class="lead">Вы приехали в священные места впервые. Языка вы не знаете. Информация рассыпана по чатам в Telegram. И вокруг — миллионы людей, которые тоже что-то ищут.</p>
+    </div>
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="pain-num">01</div>
+        <div class="pain-icon">🗺</div>
+        <h3>Карты не работают</h3>
+        <p>Google Maps в Мекке на арабском. 2ГИС не работает вообще. Apple Maps пустой. Вы не знаете, куда идти и где находитесь.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-num">02</div>
+        <div class="pain-icon">💸</div>
+        <h3>Сложно сориентироваться по ценам</h3>
+        <p>Стоимость такси без счётчика. Курс валют в обменниках разный. Услуги без понятной цены. Языковой барьер мешает уточнить детали.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-num">03</div>
+        <div class="pain-icon">📚</div>
+        <h3>Не знаете, как правильно</h3>
+        <p>Порядок таваф, саи, рми. Дуа на остановках. Что делать после выхода из ихрама. Информация противоречивая и не на вашем языке.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-num">04</div>
+        <div class="pain-icon">🍽</div>
+        <h3>Где поесть халяль?</h3>
+        <p>Ресторанов сотни, но какой подходит вашему маххабу? Где едят казахи и узбеки? Где готовят знакомую еду без сюрпризов?</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-num">05</div>
+        <div class="pain-icon">👤</div>
+        <h3>Нужен гид — а где его взять?</h3>
+        <p>Русскоязычных мутаввифов в Мекке — единицы. Найти их можно только через сарафанку. Доверять незнакомому — страшно.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-num">06</div>
+        <div class="pain-icon">🏥</div>
+        <h3>Что делать в экстренной ситуации?</h3>
+        <p>Заболели в ихраме. Потерялись от группы. Нужна аптека. Куда звонить? Кто поймёт? Скорая на арабском.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section class="solution">
+  <div class="container">
+    <div class="solution-hero">
+      <div class="solution-text">
+        <span class="label-tag">Наше решение</span>
+        <h2>Один сервис <span class="accent">для всего паломничества</span></h2>
+        <p class="lead">HajjGuide — это не просто карта. Это ваш цифровой мутаввиф, справочник и помощник в одном приложении. На вашем родном языке. С проверенными местами и людьми.</p>
+        <ul class="solution-list">
+          <li><span class="check">✓</span> Карта со всеми магазинами, кафе и услугами рядом</li>
+          <li><span class="check">✓</span> Лицензированные гиды с гарантией качества</li>
+          <li><span class="check">✓</span> Пошаговые руководства по обрядам с дуа</li>
+          <li><span class="check">✓</span> Офлайн-режим — работает без интернета</li>
+          <li><span class="check">✓</span> Поддержка на 6 языках — казахском, русском и других</li>
+        </ul>
+      </div>
+      <div class="map-visual">
+        <div class="map-tabs">
+          <div class="map-tab active"><div class="dot" style="background: white;"></div>Все</div>
+          <div class="map-tab"><div class="dot dot-food"></div>Еда</div>
+          <div class="map-tab"><div class="dot dot-shop"></div>Магазины</div>
+          <div class="map-tab"><div class="dot dot-medical"></div>Медицина</div>
+          <div class="map-tab"><div class="dot dot-money"></div>Обмен</div>
+          <div class="map-tab"><div class="dot dot-guide"></div>Гиды</div>
+        </div>
+        <div class="map-canvas">
+          <div class="map-kaaba">
+            <div class="kaaba-block"></div>
+            <div class="kaaba-label">Масджид аль-Харам</div>
+          </div>
+          <div class="map-marker m-food mk-1">🍽</div>
+          <div class="map-marker m-shop mk-2">🛒</div>
+          <div class="map-marker m-medical mk-3">⚕</div>
+          <div class="map-marker m-money mk-4">$</div>
+          <div class="map-marker m-guide mk-5">👤</div>
+          <div class="map-marker m-food mk-6">🍽</div>
+          <div class="map-marker m-shop mk-7">🛒</div>
+          <div class="map-marker m-guide mk-8">👤</div>
+        </div>
+        <div style="margin-top: 16px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--ink-mute);">
+          <span>📍 Радиус 500м от Харама</span>
+          <span style="color: var(--green-deep); font-weight: 700;">237 мест найдено</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="section-header">
+      <span class="label-tag">Возможности</span>
+      <h2>Всё, что нужно паломнику — <span class="accent">в одном приложении</span></h2>
+      <p class="lead">От первого шага в аэропорту Джидды до последнего таваф — мы рядом на каждом этапе вашего паломничества.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feat-icon">🗺</div>
+        <h3>Умная карта со слоями</h3>
+        <p>Включите нужный слой: общепит, магазины, аптеки, обменники, транспорт, святые места, медицина. Видите только то, что вам нужно.</p>
+      </div>
+      <div class="feature-card highlight">
+        <div class="feat-icon">👤</div>
+        <h3>Маркетплейс гидов</h3>
+        <p>Лицензированные мутаввифы с проверенными отзывами. Бронирование онлайн. Деньги в эскроу — гид получает их только после поездки.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">📿</div>
+        <h3>Руководства по обрядам</h3>
+        <p>Пошаговые гиды по Хаджу и Умре. Дуа на каждый этап. Голосовое сопровождение. Аудио без интернета.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">🕌</div>
+        <h3>Время намазов</h3>
+        <p>Точное расписание для Мекки и Медины. Уведомления. Кибла-компас. Расписание автоматически в карточках мест — закрыто на намаз или открыто.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">📶</div>
+        <h3>Полный офлайн-режим</h3>
+        <p>Скачайте карту и базу мест перед поездкой. Работает без интернета. Не зависит от перегруженных сетей в хадж.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">🌐</div>
+        <h3>6 языков интерфейса</h3>
+        <p>Казахский, русский, английский, турецкий, арабский, узбекский. Описания мест переведены вручную, не машинно.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">🚕</div>
+        <h3>Трансферы и такси</h3>
+        <p>Бронирование проверенных трансферов из аэропорта. Цены фиксированные. Без обмана и торга на месте.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">⭐</div>
+        <h3>Отзывы паломников</h3>
+        <p>Реальные отзывы от тех, кто уже был. Фото, оценки, советы. От людей, которые понимают ваши потребности.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">🆘</div>
+        <h3>SOS-кнопка</h3>
+        <p>Связь с поддержкой 24/7 на вашем языке. Помощь в экстренных ситуациях. Координаты вашей группы и отеля под рукой.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GUIDES MARKETPLACE -->
+<section class="guides" id="guides">
+  <div class="container">
+    <div class="guides-inner">
+      <div class="guide-card-stack">
+        <div class="guide-card gc-1">
+          <div class="guide-header">
+            <div class="guide-avatar">АХ</div>
+            <div>
+              <div class="guide-name">Абдулла Хасан</div>
+              <div class="guide-cred">
+                <span class="verified">✓ Лицензия</span>
+                Мекка · 12 лет опыта
+              </div>
+            </div>
+          </div>
+          <div class="guide-langs">
+            <span class="lang-tag">Қазақша</span>
+            <span class="lang-tag">Русский</span>
+            <span class="lang-tag">العربية</span>
+            <span class="lang-tag">English</span>
+          </div>
+          <p style="font-size: 13px; color: var(--ink-soft); line-height: 1.5; margin-bottom: 12px;">Сопровождение Умры с детальным объяснением каждого обряда. Группы до 10 человек.</p>
+          <div class="guide-meta">
+            <div class="guide-rating">★ 4.9 (247)</div>
+            <div class="guide-price">от $120</div>
+          </div>
+        </div>
+        <div class="guide-card gc-2">
+          <div class="guide-header">
+            <div class="guide-avatar">ФА</div>
+            <div>
+              <div class="guide-name">Фатима Аль-Захра</div>
+              <div class="guide-cred">
+                <span class="verified">✓ Лицензия</span>
+                Медина · только женские группы
+              </div>
+            </div>
+          </div>
+          <div class="guide-langs">
+            <span class="lang-tag">Қазақша</span>
+            <span class="lang-tag">Türkçe</span>
+            <span class="lang-tag">العربية</span>
+          </div>
+          <p style="font-size: 13px; color: var(--ink-soft); line-height: 1.5; margin-bottom: 12px;">Зиярат по Медине, исторические места, специализация — женские группы и семьи.</p>
+          <div class="guide-meta">
+            <div class="guide-rating">★ 5.0 (89)</div>
+            <div class="guide-price">от $95</div>
+          </div>
+        </div>
+        <div class="guide-card gc-3">
+          <div class="guide-header">
+            <div class="guide-avatar">МР</div>
+            <div>
+              <div class="guide-name">Мухаммад Рашид</div>
+              <div class="guide-cred">
+                <span class="verified">✓ Лицензия</span>
+                Мекка/Медина · полный пакет
+              </div>
+            </div>
+          </div>
+          <div class="guide-langs">
+            <span class="lang-tag">Қазақша</span>
+            <span class="lang-tag">Русский</span>
+            <span class="lang-tag">English</span>
+          </div>
+          <div class="guide-meta">
+            <div class="guide-rating">★ 4.8 (412)</div>
+            <div class="guide-price">от $850</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <span class="label-tag">Маркетплейс гидов</span>
+        <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 44px; font-weight: 600; color: var(--green-deep); line-height: 1.1; margin-bottom: 20px;">Найдите <span style="color: var(--gold); font-style: italic;">своего мутаввифа</span></h2>
+        <p style="font-size: 18px; color: var(--ink-soft); margin-bottom: 24px; line-height: 1.6;">600+ лицензированных гидов в Мекке и Медине. Фильтры по языку, цене, опыту и специализации. Безопасное бронирование с защитой платежа.</p>
+        <ul class="solution-list" style="margin-bottom: 32px;">
+          <li><span class="check">✓</span> Проверка лицензии Минхадж (tasreeh)</li>
+          <li><span class="check">✓</span> Защита платежа — деньги в эскроу до завершения</li>
+          <li><span class="check">✓</span> Реальные отзывы от прошлых паломников</li>
+          <li><span class="check">✓</span> Гиды-женщины для женских групп</li>
+          <li><span class="check">✓</span> Чат с гидом до и во время поездки</li>
+        </ul>
+        <a href="#cta" class="btn btn-gold btn-large">Найти гида</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="container">
+    <div class="section-header">
+      <span class="label-tag">Как это работает</span>
+      <h2>От установки до первого <span class="accent">таваф</span></h2>
+      <p class="lead">Четыре простых шага — и у вас в руках всё необходимое для спокойного паломничества.</p>
+    </div>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="step-num">1</div>
+        <h4>Установите приложение</h4>
+        <p>Скачайте бесплатно из App Store или Google Play. Выберите казахский или другой язык.</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">2</div>
+        <h4>Скачайте офлайн-карту</h4>
+        <p>Загрузите данные Мекки и Медины перед поездкой. Они будут работать без интернета.</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">3</div>
+        <h4>Выберите гида</h4>
+        <p>Просмотрите профили, отзывы, цены. Забронируйте мутаввифа на нужные даты.</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">4</div>
+        <h4>Совершите паломничество</h4>
+        <p>Идите по картам, читайте дуа, общайтесь с гидом. Мы рядом 24/7.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section class="benefits">
+  <div class="container">
+    <div class="section-header">
+      <span class="label-tag">Сравнение</span>
+      <h2>Почему HajjGuide <span class="accent">лучше других</span></h2>
+      <p class="lead">Мы не делаем универсальное приложение для туристов. Мы делаем единственное в своём роде решение для паломников.</p>
+    </div>
+    <div class="compare">
+      <div class="compare-row">
+        <div class="compare-feature"></div>
+        <div class="compare-cell compare-header" style="color: var(--green-deep);">HajjGuide</div>
+        <div class="compare-cell compare-header">Google Maps</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-feature">Карта на казахском и других языках</div>
+        <div class="compare-cell yes">✓ 6 языков</div>
+        <div class="compare-cell partial">Частично</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-feature">Места рядом с Харамом и Набави</div>
+        <div class="compare-cell yes">✓ С расстояниями</div>
+        <div class="compare-cell no">Нет привязки</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-feature">Поиск гида-мутаввифа</div>
+        <div class="compare-cell yes">✓ Маркетплейс</div>
+        <div class="compare-cell no">Нет</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-feature">Время намазов и кибла</div>
+        <div class="compare-cell yes">✓ Встроено</div>
+        <div class="compare-cell no">Нет</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-feature">Руководства по обрядам</div>
+        <div class="compare-cell yes">✓ Пошагово</div>
+        <div class="compare-cell no">Нет</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-feature">Метка "халяль", махраб, гендерное разделение</div>
+        <div class="compare-cell yes">✓ Все фильтры</div>
+        <div class="compare-cell no">Нет</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-feature">Офлайн-режим</div>
+        <div class="compare-cell yes">✓ Полный</div>
+        <div class="compare-cell partial">Только карты</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-feature">Эскроу-платежи за услуги</div>
+        <div class="compare-cell yes">✓ Защищено</div>
+        <div class="compare-cell no">Нет</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-feature">Поддержка на казахском и других языках</div>
+        <div class="compare-cell yes">✓ 24/7</div>
+        <div class="compare-cell no">Нет</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+  <div class="container">
+    <div class="section-header">
+      <span class="label-tag">Отзывы паломников</span>
+      <h2>Что говорят те, <span class="accent">кто уже был</span></h2>
+    </div>
+    <div class="test-grid">
+      <div class="test-card">
+        <div class="test-quote">"</div>
+        <div class="test-text">Поехала с мамой на Умру первый раз. Без приложения мы бы потерялись в первый же день. Нашли русскоговорящего гида прямо там, всё было прозрачно. Очень спасибо разработчикам.</div>
+        <div class="test-author">
+          <div class="test-avatar">АН</div>
+          <div>
+            <div class="test-name">Айгуль Нурлыбаева</div>
+            <div class="test-role">Алматы · Умра 2025</div>
+          </div>
+        </div>
+      </div>
+      <div class="test-card">
+        <div class="test-quote">"</div>
+        <div class="test-text">Карта с указанием халяль-ресторанов спасла мою группу. 20 человек, разные махабы, у всех свои привычки в еде. С приложением быстро находили подходящие места рядом с отелем.</div>
+        <div class="test-author">
+          <div class="test-avatar">МК</div>
+          <div>
+            <div class="test-name">Марат Какимжанов</div>
+            <div class="test-role">Шымкент · Хадж 2025</div>
+          </div>
+        </div>
+      </div>
+      <div class="test-card">
+        <div class="test-quote">"</div>
+        <div class="test-text">Самое ценное — пошаговые инструкции с дуа. Я впервые в жизни делал таваф, и приложение буквально вело меня по кругу. Слышал в наушниках спокойный голос на казахском. Машаллах.</div>
+        <div class="test-author">
+          <div class="test-avatar">БС</div>
+          <div>
+            <div class="test-name">Бауыржан Сейтжанов</div>
+            <div class="test-role">Астана · Умра 2026</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="container">
+    <div class="section-header">
+      <span class="label-tag">Частые вопросы</span>
+      <h2>Что спрашивают <span class="accent">чаще всего</span></h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">Приложение действительно бесплатное?</div>
+        <div class="faq-a">Да, базовый функционал бесплатен навсегда: карта, поиск мест, расписание намазов, руководства по обрядам. Премиум-подписка ($4.99/месяц) даёт расширенные функции — офлайн-загрузка всех данных, голосовое сопровождение, приоритетная поддержка. Комиссия с гидов берётся только с тех, кто получает заказы.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Как вы проверяете гидов?</div>
+        <div class="faq-a">Каждый гид проходит трёхступенчатую проверку: подтверждение лицензии Министерства Хаджа (tasreeh), личное интервью с нашим представителем в Мекке, проверка отзывов и опыта. Гиды без лицензии на платформу не допускаются.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Что если мне не понравится гид?</div>
+        <div class="faq-a">Деньги хранятся у нас в эскроу. Если есть проблемы, мы разбираемся: оплата приостанавливается, к делу подключается арбитраж. В случае серьёзного нарушения деньги возвращаются полностью. Гид удаляется с платформы при системных жалобах.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Будет ли работать в Саудовской Аравии?</div>
+        <div class="faq-a">Да. Мы протестировали приложение в реальных условиях во время хаджа и Рамадана. Офлайн-режим работает при любом качестве связи. Карты и база данных хранятся на устройстве.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Можно ли пользоваться без знания арабского?</div>
+        <div class="faq-a">Полностью. Интерфейс на 6 языках, включая казахский. Все описания мест переведены вручную. В чате с гидом — встроенный переводчик. Голосовое сопровождение обрядов на родном языке.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Можно ли использовать в Хадж и Умру?</div>
+        <div class="faq-a">Приложение специально создано для обоих видов паломничества. Содержит отдельные пошаговые руководства для Умры (4 этапа) и Хаджа (5 дней + подготовка). Карты включают зоны Мина, Муздалифа и Арафат с расписаниями.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-final" id="cta">
+  <div class="container">
+    <div class="cta-final-inner">
+      <span class="label-tag" style="color: var(--gold-light);">Начните своё спокойное паломничество</span>
+      <h2>Скачайте HajjGuide и <span class="accent">подготовьтесь правильно</span></h2>
+      <p>Установка занимает минуту. Сэкономит часы поиска, нервы и деньги — на каждом дне вашего пребывания в священных местах.</p>
+      <div class="cta-buttons">
+        <a href="#" class="btn btn-white btn-large">📱 App Store</a>
+        <a href="#" class="btn btn-white btn-large">📱 Google Play</a>
+        <a href="#" class="btn btn-ghost btn-large">Открыть в браузере</a>
+      </div>
+      <div class="languages-row">
+        <span class="lang-pill">🇰🇿 Қазақша</span>
+        <span class="lang-pill">🇷🇺 Русский</span>
+        <span class="lang-pill">🇬🇧 English</span>
+        <span class="lang-pill">🇹🇷 Türkçe</span>
+        <span class="lang-pill">🇸🇦 العربية</span>
+        <span class="lang-pill">🇺🇿 Oʻzbekcha</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h4>HajjGuide</h4>
+        <p>Цифровая платформа для паломников Хаджа и Умры. Карта, гиды, руководства, поддержка — всё для спокойного паломничества к святыням ислама.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Продукт</h5>
+        <ul>
+          <li><a href="#features">Возможности</a></li>
+          <li><a href="#guides">Гиды</a></li>
+          <li><a href="#how">Как работает</a></li>
+          <li><a href="#">Премиум</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Компания</h5>
+        <ul>
+          <li><a href="#">О нас</a></li>
+          <li><a href="#">Партнёрам</a></li>
+          <li><a href="#">Турагентствам</a></li>
+          <li><a href="#">Стать гидом</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Поддержка</h5>
+        <ul>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#">Контакты</a></li>
+          <li><a href="#">Политика</a></li>
+          <li><a href="#">Условия</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2026 HajjGuide. Все права защищены. · Made with respect for the Ummah
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
