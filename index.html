@@ -1371,13 +1371,39 @@
       gap: 40px;
     }
     .guides-inner > div:last-child { order: -1; }
-    .guide-card-stack { height: 480px; margin: 0 auto; max-width: 360px; }
-    .guide-card { padding: 20px; width: 95%; }
-    .guide-avatar { width: 48px; height: 48px; font-size: 17px; }
-    .guide-name { font-size: 15px; }
-    .guide-cred { font-size: 11px; flex-wrap: wrap; }
-    .lang-tag { font-size: 10px; padding: 3px 8px; }
-    .guide-price { font-size: 15px; }
+
+	/* Превращаем стопку в вертикальный список */
+	.guide-card-stack {
+	  height: auto;
+	  position: static;
+	  display: flex;
+	  flex-direction: column;
+	  gap: 16px;
+	  max-width: 420px;
+	  margin: 0 auto;
+	  width: 100%;
+	}
+	.guide-card {
+	  position: static;
+	  width: 100%;
+	  transform: none;
+	  padding: 20px;
+	  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+	}
+	/* Сбрасываем индивидуальные позиции карточек */
+	.gc-1, .gc-2, .gc-3 {
+	  top: auto;
+	  left: auto;
+	  right: auto;
+	  bottom: auto;
+	  transform: none;
+	}
+
+	.guide-avatar { width: 48px; height: 48px; font-size: 17px; }
+	.guide-name { font-size: 15px; }
+	.guide-cred { font-size: 11px; flex-wrap: wrap; }
+	.lang-tag { font-size: 10px; padding: 3px 8px; }
+	.guide-price { font-size: 15px; }
 
     /* How */
     .how-steps {
