@@ -1226,21 +1226,285 @@
     gap: 8px;
   }
 
-  /* Responsive */
+  /* ===================== RESPONSIVE ===================== */
+
+  /* === TABLET (1024px and below) === */
+  @media (max-width: 1024px) {
+    .container { padding: 0 24px; }
+    .hero h1 { font-size: 44px; }
+    .section-header h2,
+    .solution-text h2,
+    .cta-final h2 { font-size: 38px; }
+    .hero .lead, .section-header .lead { font-size: 17px; }
+    .features-grid { grid-template-columns: repeat(2, 1fr); }
+    .pain-grid { grid-template-columns: repeat(2, 1fr); }
+    .test-grid { grid-template-columns: repeat(2, 1fr); }
+    .footer-grid { grid-template-columns: 2fr 1fr 1fr; }
+    .footer-grid .footer-col:last-child { grid-column: span 3; }
+  }
+
+  /* === MOBILE LARGE (768px and below) === */
   @media (max-width: 768px) {
-    .hero-inner, .solution-hero, .guides-inner, .footer-grid {
+    body { font-size: 15px; }
+    .container { padding: 0 18px; }
+    section { padding: 60px 0; }
+
+    /* Navigation */
+    .nav-inner { padding: 14px 18px; }
+    .nav-links { display: none; }
+    .logo { font-size: 20px; }
+    .logo-mark { width: 36px; height: 36px; font-size: 18px; }
+    nav .btn { padding: 10px 16px; font-size: 13px; }
+
+    /* Hero */
+    .hero { padding: 50px 0 60px; }
+    .hero-inner {
+      grid-template-columns: 1fr;
+      gap: 50px;
+    }
+    .hero h1 { font-size: 36px; line-height: 1.1; }
+    .hero .lead { font-size: 16px; }
+    .hero-cta {
+      flex-direction: column;
+      gap: 10px;
+    }
+    .hero-cta .btn { width: 100%; text-align: center; }
+    .hero-trust {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .hero-visual {
+      height: 560px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .phone {
+      position: relative;
+      right: auto;
+      top: auto;
+      width: 280px;
+      height: 540px;
+    }
+    .float-badge { padding: 10px 12px; }
+    .badge-1 { top: 60px; left: -10px; }
+    .badge-2 { bottom: 40px; left: -20px; }
+    .badge-text-title { font-size: 12px; }
+    .badge-text-sub { font-size: 10px; }
+    .badge-icon { width: 32px; height: 32px; font-size: 14px; }
+
+    /* Hero ornaments smaller */
+    .hero-ornament-1 { width: 250px; height: 250px; right: -80px; }
+    .hero-ornament-2 { width: 200px; height: 200px; left: -60px; }
+
+    /* Stats */
+    .stats { padding: 35px 0; }
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px 16px;
+    }
+    .stat-item {
+      border-right: none;
+      padding: 0;
+    }
+    .stat-item:nth-child(odd) {
+      border-right: 1px solid rgba(255,255,255,0.15);
+    }
+    .stat-num { font-size: 36px; }
+    .stat-label { font-size: 11px; letter-spacing: 1px; }
+
+    /* Section headers */
+    .section-header { margin-bottom: 40px; }
+    .section-header h2,
+    .solution-text h2 { font-size: 30px; }
+    .section-header .lead { font-size: 15px; }
+    .label-tag { font-size: 11px; }
+
+    /* Pain */
+    .pain-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .pain-card { padding: 24px; }
+    .pain-card h3 { font-size: 19px; }
+    .pain-card p { font-size: 14px; }
+    .pain-num { font-size: 44px; top: 14px; right: 18px; }
+    .pain-icon { width: 48px; height: 48px; font-size: 20px; }
+
+    /* Solution */
+    .solution-hero {
       grid-template-columns: 1fr;
       gap: 40px;
     }
-    .hero h1, .section-header h2, .solution-text h2, .cta-final h2 { font-size: 36px; }
-    .stats-grid, .pain-grid, .features-grid, .test-grid, .how-steps {
-      grid-template-columns: 1fr 1fr;
+    .map-visual { padding: 18px; }
+    .map-canvas { height: 280px; }
+    .map-tabs { gap: 6px; }
+    .map-tab { padding: 6px 10px; font-size: 11px; }
+    .map-kaaba .kaaba-block { width: 44px; height: 44px; }
+    .kaaba-label { font-size: 10px; padding: 2px 8px; }
+    .map-marker { width: 26px; height: 26px; font-size: 12px; }
+    .solution-list li { font-size: 15px; padding: 12px 0; }
+    .check { width: 24px; height: 24px; font-size: 12px; }
+
+    /* Features */
+    .features-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .feature-card { padding: 28px 22px; }
+    .feature-card h3 { font-size: 20px; }
+    .feature-card p { font-size: 14px; }
+    .feat-icon { width: 52px; height: 52px; font-size: 24px; }
+
+    /* Guides */
+    .guides-inner {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+    .guides-inner > div:last-child { order: -1; }
+    .guide-card-stack { height: 480px; margin: 0 auto; max-width: 360px; }
+    .guide-card { padding: 20px; width: 95%; }
+    .guide-avatar { width: 48px; height: 48px; font-size: 17px; }
+    .guide-name { font-size: 15px; }
+    .guide-cred { font-size: 11px; flex-wrap: wrap; }
+    .lang-tag { font-size: 10px; padding: 3px 8px; }
+    .guide-price { font-size: 15px; }
+
+    /* How */
+    .how-steps {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 32px 16px;
     }
     .how-steps::before { display: none; }
-    .nav-links { display: none; }
-    .container { padding: 0 20px; }
-    section { padding: 60px 0; }
-    .stat-num { font-size: 36px; }
+    .step-num { width: 64px; height: 64px; font-size: 26px; border-width: 2px; }
+    .how-step h4 { font-size: 17px; }
+    .how-step p { font-size: 13px; }
+
+    /* Compare table */
+    .compare { padding: 24px 18px; }
+    .compare-row {
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 10px;
+      padding: 14px 0;
+    }
+    .compare-feature { font-size: 13px; }
+    .compare-cell { font-size: 12px; }
+    .compare-header { font-size: 11px; letter-spacing: 0.5px; }
+
+    /* Testimonials */
+    .test-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .test-card { padding: 24px; }
+    .test-text { font-size: 14px; }
+    .test-quote { font-size: 60px; top: 10px; right: 18px; }
+
+    /* FAQ */
+    .faq-item { padding: 20px 22px; }
+    .faq-q { font-size: 17px; }
+    .faq-a { font-size: 14px; }
+
+    /* CTA Final */
+    .cta-final { padding: 70px 0; }
+    .cta-final h2 { font-size: 32px; }
+    .cta-final p { font-size: 16px; margin-bottom: 28px; }
+    .cta-buttons {
+      flex-direction: column;
+      gap: 10px;
+    }
+    .cta-buttons .btn { width: 100%; text-align: center; }
+    .languages-row { gap: 8px; }
+    .lang-pill { font-size: 12px; padding: 6px 12px; }
+
+    /* Footer */
+    .footer-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    .footer-grid .footer-col:last-child {
+      grid-column: auto;
+    }
+    .footer-brand h4 { font-size: 24px; }
+    footer { padding: 40px 0 24px; }
+
+    /* Buttons */
+    .btn-large { padding: 14px 24px; font-size: 15px; }
+  }
+
+  /* === MOBILE SMALL (480px and below) === */
+  @media (max-width: 480px) {
+    .container { padding: 0 16px; }
+    section { padding: 50px 0; }
+
+    /* Hide brand text in nav, keep only logo mark */
+    .logo {
+      gap: 0;
+      font-size: 0;
+    }
+    .logo .logo-mark { font-size: 18px; }
+
+    /* Even tighter typography */
+    .hero h1 { font-size: 30px; }
+    .section-header h2,
+    .solution-text h2 { font-size: 26px; }
+    .cta-final h2 { font-size: 28px; }
+
+    /* Phone smaller */
+    .phone { width: 260px; height: 500px; }
+    .hero-visual { height: 520px; }
+
+    /* Floating badges adjust */
+    .float-badge { padding: 8px 10px; gap: 8px; }
+    .badge-1 { top: 50px; left: 0; }
+    .badge-2 { bottom: 30px; left: 0; }
+
+    /* Stats - one column on tiny screens */
+    .stats-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 12px;
+    }
+    .stat-num { font-size: 30px; }
+
+    /* Compare table - simpler */
+    .compare-row {
+      grid-template-columns: 1fr;
+      gap: 6px;
+      padding: 14px 0;
+      text-align: left;
+    }
+    .compare-row .compare-cell {
+      text-align: left;
+      padding-left: 12px;
+    }
+    .compare-row:first-child {
+      display: none;
+    }
+    .compare-feature {
+      font-weight: 700;
+      color: var(--green-deep);
+      margin-bottom: 4px;
+    }
+    .compare-cell::before {
+      content: attr(data-label);
+      display: inline-block;
+      font-size: 10px;
+      color: var(--ink-mute);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-right: 6px;
+      font-weight: 600;
+    }
+
+    /* Map tabs scroll on tiny screens */
+    .map-tabs {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .map-tab { flex-shrink: 0; }
   }
 </style>
 </head>
@@ -1691,48 +1955,48 @@
       </div>
       <div class="compare-row">
         <div class="compare-feature">Карта на казахском и других языках</div>
-        <div class="compare-cell yes">✓ 6 языков</div>
-        <div class="compare-cell partial">Частично</div>
+        <div class="compare-cell yes" data-label="HajjGuide:">✓ 6 языков</div>
+        <div class="compare-cell partial" data-label="Google:">Частично</div>
       </div>
       <div class="compare-row">
         <div class="compare-feature">Места рядом с Харамом и Набави</div>
-        <div class="compare-cell yes">✓ С расстояниями</div>
-        <div class="compare-cell no">Нет привязки</div>
+        <div class="compare-cell yes" data-label="HajjGuide:">✓ С расстояниями</div>
+        <div class="compare-cell no" data-label="Google:">Нет привязки</div>
       </div>
       <div class="compare-row">
         <div class="compare-feature">Поиск гида-мутаввифа</div>
-        <div class="compare-cell yes">✓ Маркетплейс</div>
-        <div class="compare-cell no">Нет</div>
+        <div class="compare-cell yes" data-label="HajjGuide:">✓ Маркетплейс</div>
+        <div class="compare-cell no" data-label="Google:">Нет</div>
       </div>
       <div class="compare-row">
         <div class="compare-feature">Время намазов и кибла</div>
-        <div class="compare-cell yes">✓ Встроено</div>
-        <div class="compare-cell no">Нет</div>
+        <div class="compare-cell yes" data-label="HajjGuide:">✓ Встроено</div>
+        <div class="compare-cell no" data-label="Google:">Нет</div>
       </div>
       <div class="compare-row">
         <div class="compare-feature">Руководства по обрядам</div>
-        <div class="compare-cell yes">✓ Пошагово</div>
-        <div class="compare-cell no">Нет</div>
+        <div class="compare-cell yes" data-label="HajjGuide:">✓ Пошагово</div>
+        <div class="compare-cell no" data-label="Google:">Нет</div>
       </div>
       <div class="compare-row">
         <div class="compare-feature">Метка "халяль", махраб, гендерное разделение</div>
-        <div class="compare-cell yes">✓ Все фильтры</div>
-        <div class="compare-cell no">Нет</div>
+        <div class="compare-cell yes" data-label="HajjGuide:">✓ Все фильтры</div>
+        <div class="compare-cell no" data-label="Google:">Нет</div>
       </div>
       <div class="compare-row">
         <div class="compare-feature">Офлайн-режим</div>
-        <div class="compare-cell yes">✓ Полный</div>
-        <div class="compare-cell partial">Только карты</div>
+        <div class="compare-cell yes" data-label="HajjGuide:">✓ Полный</div>
+        <div class="compare-cell partial" data-label="Google:">Только карты</div>
       </div>
       <div class="compare-row">
         <div class="compare-feature">Эскроу-платежи за услуги</div>
-        <div class="compare-cell yes">✓ Защищено</div>
-        <div class="compare-cell no">Нет</div>
+        <div class="compare-cell yes" data-label="HajjGuide:">✓ Защищено</div>
+        <div class="compare-cell no" data-label="Google:">Нет</div>
       </div>
       <div class="compare-row">
         <div class="compare-feature">Поддержка на казахском и других языках</div>
-        <div class="compare-cell yes">✓ 24/7</div>
-        <div class="compare-cell no">Нет</div>
+        <div class="compare-cell yes" data-label="HajjGuide:">✓ 24/7</div>
+        <div class="compare-cell no" data-label="Google:">Нет</div>
       </div>
     </div>
   </div>
