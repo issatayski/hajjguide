@@ -270,11 +270,22 @@ a { color: inherit; text-decoration: none; }
    ============================================ */
 #map-container {
   width: 100%;
-  height: calc(100vh - 200px);
+  height: 65vh;
+  min-height: 420px;
   position: relative;
-  background: #e8f3ee;
+  background-color: #e8eef0;
+  background-image:
+    linear-gradient(rgba(13,77,53,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(13,77,53,0.06) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
-#map { width: 100%; height: 100%; }
+#map {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
 .map-overlay {
   position: absolute;
   z-index: 500;
