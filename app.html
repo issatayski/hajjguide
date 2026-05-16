@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Takia — Карта Мекки</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/[email protected]/dist/leaflet.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/[email protected]/dist/leaflet.css" onerror="this.remove()" />
 <link rel="stylesheet" href="assets/styles.css">
 <style>
   #map { z-index: 1; }
@@ -219,8 +219,47 @@
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<script src="https://unpkg.com/[email protected]/dist/leaflet.js"></script>
 <script src="assets/data.js"></script>
+<script>
+  // Load Leaflet. On a real host (Git Pages / ps.kz) there is always
+  // internet, so this loads instantly. We try several CDNs in order,
+  // and only fall back to the offline SVG map if ALL of them fail.
+  (function loadLeaflet(cb) {
+    // To bundle Leaflet in your repo (recommended for production):
+    // download leaflet.js into assets/ and add 'assets/leaflet.js' as
+    // the FIRST item below. See README for instructions.
+    var sources = [
+      'https://cdn.jsdelivr.net/npm/[email protected]/dist/leaflet.js',
+      'https://unpkg.com/[email protected]/dist/leaflet.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js'
+    ];
+    var i = 0;
+    function tryNext() {
+      if (i >= sources.length) {
+        // Every source failed — use offline SVG fallback
+        window.__leafletOK = false;
+        cb();
+        return;
+      }
+      var s = document.createElement('script');
+      s.src = sources[i++];
+      s.onload = function() {
+        if (typeof window.L !== 'undefined') {
+          window.__leafletOK = true;
+          cb();
+        } else {
+          tryNext();
+        }
+      };
+      s.onerror = tryNext;
+      document.head.appendChild(s);
+    }
+    tryNext();
+  })(function() {
+    window.__mapStarted = true;
+    startMap();
+  });
+</script>
 <script>
   // Initial state
   let currentCity = 'Mecca';
@@ -229,8 +268,147 @@
   let markers = [];
   let map;
 
-  // Initialize map
+  // ============================================================
+  // FALLBACK MAP — pure SVG, no internet, no Leaflet needed.
+  // Draws a stylized 2GIS-like street schematic with markers
+  // positioned by real coordinates relative to the Haram.
+  // ============================================================
+  function initFallbackMap() {
+    window.__mapRendered = true;
+    renderFallback();
+    // Re-render when filters change: renderPlaces() delegates here
+  }
+
+  function renderFallback() {
+    const ref = currentCity === 'Mecca' ? HARAM_MECCA : HARAM_MEDINA;
+    const places = getFilteredPlaces();
+
+    // Update counters (same as Leaflet path)
+    document.getElementById('resultsCounter').textContent =
+      places.length === 0 ? 'Ничего не найдено' :
+      `${places.length} ${declensionPlaces(places.length)} найдено`;
+    document.getElementById('listCount').textContent =
+      `${places.length} ${declensionPlaces(places.length)}`;
+
+    // Compute bounding box around reference + places to scale coords
+    let pts = places.concat([{ lat: ref.lat, lng: ref.lng }]);
+    let minLat = Math.min(...pts.map(p => p.lat));
+    let maxLat = Math.max(...pts.map(p => p.lat));
+    let minLng = Math.min(...pts.map(p => p.lng));
+    let maxLng = Math.max(...pts.map(p => p.lng));
+    // Pad the box
+    const padLat = (maxLat - minLat) * 0.25 + 0.001;
+    const padLng = (maxLng - minLng) * 0.25 + 0.001;
+    minLat -= padLat; maxLat += padLat;
+    minLng -= padLng; maxLng += padLng;
+
+    const W = 1000, H = 1000;
+    function px(lng) { return ((lng - minLng) / (maxLng - minLng)) * W; }
+    function py(lat) { return H - ((lat - minLat) / (maxLat - minLat)) * H; }
+
+    // Build decorative "streets" — pseudo grid + radial roads from Haram
+    const hx = px(ref.lng), hy = py(ref.lat);
+    let streets = '';
+    for (let i = 1; i < 8; i++) {
+      const gx = (W / 8) * i;
+      const gy = (H / 8) * i;
+      streets += `<line x1="${gx}" y1="0" x2="${gx}" y2="${H}" stroke="#dde6e1" stroke-width="${i%2?6:10}"/>`;
+      streets += `<line x1="0" y1="${gy}" x2="${W}" y2="${gy}" stroke="#dde6e1" stroke-width="${i%2?6:10}"/>`;
+    }
+    // Ring roads around Haram
+    streets += `<circle cx="${hx}" cy="${hy}" r="140" fill="none" stroke="#d4ddd8" stroke-width="9"/>`;
+    streets += `<circle cx="${hx}" cy="${hy}" r="260" fill="none" stroke="#d4ddd8" stroke-width="7"/>`;
+    // Radial roads
+    for (let a = 0; a < 360; a += 45) {
+      const rad = a * Math.PI / 180;
+      streets += `<line x1="${hx}" y1="${hy}" x2="${hx + Math.cos(rad)*460}" y2="${hy + Math.sin(rad)*460}" stroke="#dde6e1" stroke-width="7"/>`;
+    }
+
+    // Place markers — with collision spreading so labels don't overlap
+    let positioned = places.map(place => ({
+      place: place,
+      x: px(place.lng),
+      y: py(place.lat)
+    }));
+
+    // Simple repulsion: push apart markers closer than minDist
+    const minDist = 110;
+    for (let iter = 0; iter < 60; iter++) {
+      for (let i = 0; i < positioned.length; i++) {
+        for (let j = i + 1; j < positioned.length; j++) {
+          let a = positioned[i], b = positioned[j];
+          let dx = b.x - a.x, dy = b.y - a.y;
+          let d = Math.sqrt(dx*dx + dy*dy) || 1;
+          if (d < minDist) {
+            let push = (minDist - d) / 2;
+            let ux = dx / d, uy = dy / d;
+            a.x -= ux * push; a.y -= uy * push;
+            b.x += ux * push; b.y += uy * push;
+          }
+        }
+      }
+    }
+    // Keep inside canvas
+    positioned.forEach(p => {
+      p.x = Math.max(40, Math.min(W - 40, p.x));
+      p.y = Math.max(40, Math.min(H - 40, p.y));
+    });
+
+    let pins = '';
+    positioned.forEach(item => {
+      const place = item.place;
+      const cat = CATEGORIES[place.category];
+      const x = item.x, y = item.y;
+      pins += `
+        <g class="fb-pin" transform="translate(${x},${y})" style="cursor:pointer"
+           onclick="openPlace('${place.id}')">
+          <circle cx="0" cy="0" r="19" fill="${cat.color}" stroke="white" stroke-width="3"/>
+          <text x="0" y="6" font-size="17" text-anchor="middle">${cat.icon}</text>
+          <g transform="translate(24,-10)">
+            <rect x="0" y="0" rx="5" height="21" width="${10 + place.name.length * 6.2}"
+                  fill="rgba(255,255,255,0.96)" stroke="rgba(13,77,53,0.15)"/>
+            <text x="6" y="15" font-size="11.5" font-weight="700" fill="#1a2620">${place.name}</text>
+          </g>
+        </g>`;
+    });
+
+    const svg = `
+      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice"
+           style="width:100%;height:100%;display:block;background:#eef3f0;">
+        <rect width="${W}" height="${H}" fill="#eef3f0"/>
+        <!-- green areas -->
+        <circle cx="${W*0.15}" cy="${H*0.2}" r="90" fill="#dcebe2"/>
+        <circle cx="${W*0.85}" cy="${H*0.78}" r="110" fill="#dcebe2"/>
+        <rect x="${W*0.6}" y="${H*0.1}" width="140" height="100" rx="14" fill="#dcebe2"/>
+        ${streets}
+        <!-- Haram -->
+        <g transform="translate(${hx},${hy})">
+          <circle cx="0" cy="0" r="34" fill="#0d4d35" stroke="#c9a44a" stroke-width="4"/>
+          <text x="0" y="9" font-size="26" text-anchor="middle" fill="#c9a44a">ﷲ</text>
+          <g transform="translate(0,-52)">
+            <rect x="-62" y="0" rx="7" height="26" width="124" fill="#0d4d35"/>
+            <text x="0" y="18" font-size="14" font-weight="700" text-anchor="middle" fill="white">
+              ${currentCity === 'Mecca' ? 'Аль-Харам' : 'ан-Набави'}
+            </text>
+          </g>
+        </g>
+        ${pins}
+      </svg>
+      <div style="position:absolute;bottom:10px;left:10px;background:rgba(255,255,255,0.9);
+                  padding:5px 10px;border-radius:6px;font-size:11px;color:#7a8a82;
+                  box-shadow:0 1px 4px rgba(0,0,0,0.1);">
+        Схематичная карта · офлайн-режим
+      </div>`;
+
+    const cont = document.getElementById('map');
+    cont.innerHTML = svg;
+    cont.style.position = 'relative';
+    renderList(places);
+  }
+
+  // Initialize map (Leaflet path)
   function initMap() {
+    window.__mapRendered = true;
     const center = currentCity === 'Mecca' ? [21.4225, 39.8262] : [24.4672, 39.6112];
     map = L.map('map', {
       zoomControl: false,
@@ -240,12 +418,35 @@
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // CARTO Voyager — colorful, detailed streets and POI like 2GIS / modern maps
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    // Primary tiles: CARTO Voyager (colorful, 2GIS-like).
+    // If they fail to load, automatically fall back to OpenStreetMap.
+    var tilesLoaded = false;
+    var cartoLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       maxZoom: 20,
       subdomains: 'abcd',
+      crossOrigin: true,
       attribution: '© OpenStreetMap, © CARTO'
-    }).addTo(map);
+    });
+
+    cartoLayer.on('load', function() { tilesLoaded = true; });
+    cartoLayer.on('tileerror', function() {
+      if (!tilesLoaded) {
+        // CARTO blocked or offline — switch to OSM
+        map.removeLayer(cartoLayer);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          crossOrigin: true,
+          attribution: '© OpenStreetMap'
+        }).addTo(map);
+      }
+    });
+    cartoLayer.addTo(map);
+
+    // Critical: recalculate map size after layout settles.
+    // Without this, the map shows as a blank colored box.
+    setTimeout(function() { map.invalidateSize(); }, 100);
+    setTimeout(function() { map.invalidateSize(); }, 600);
+    window.addEventListener('resize', function() { map.invalidateSize(); });
 
     // Hide place labels when zoomed out (like 2GIS) to avoid clutter
     map.on('zoomend', function() {
@@ -290,6 +491,11 @@
   }
 
   function renderPlaces() {
+    // If running in offline SVG fallback mode, delegate there
+    if (!window.__leafletOK || typeof L === 'undefined' || !map) {
+      renderFallback();
+      return;
+    }
     clearMarkers();
     const places = getFilteredPlaces();
 
@@ -445,12 +651,28 @@
   document.getElementById('welcomeName').textContent = CURRENT_USER.name;
   document.getElementById('tripDays').textContent = CURRENT_USER.trip.daysUntil;
 
-  // Init map
-  initMap();
+  // startMap() is called by the Leaflet loader (above).
+  // It picks the real map if Leaflet loaded, or the SVG fallback if not.
+  window.startMap = function() {
+    if (window.__leafletOK && typeof L !== 'undefined') {
+      try {
+        initMap();
+        return;
+      } catch (e) {
+        console.warn('Leaflet init failed, using fallback', e);
+      }
+    }
+    initFallbackMap();
+  };
+
+  // If loader already fired before this script ran, start now
+  if (window.__mapStarted && !window.__mapRendered) {
+    window.startMap();
+  }
 
   // Show welcome toast if first visit
   if (!sessionStorage.getItem('takia_welcomed')) {
-    setTimeout(() => showToast('Ас-саляму алейкум! Добро пожаловать в Takia ✨', 'success'), 500);
+    setTimeout(() => showToast('Ас-саляму алейкум! Добро пожаловать в Takia ✨', 'success'), 800);
     sessionStorage.setItem('takia_welcomed', '1');
   }
 </script>
